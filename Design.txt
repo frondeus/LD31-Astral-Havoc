@@ -1,0 +1,18 @@
+Design:
+
+Enemies:
+	*Casual ship
+		Nie za szybki
+		Strzela zwyklymi pociskami
+		Ma 100 hp
+		Jest najczestszy
+	*Laser ship
+		Ma laser. Który działa okresowo.
+		Ma 150 hp.
+	*
+
+Todo:
+Poprawić kolizje
+Urozmaicić
+Bossowie
+Zmniejszyć czas pocisków na ziemii.
