@@ -28,14 +28,18 @@ LD31.Collisions.prototype =
 
 	isCollide: function(A,B)
 	{
+		A.a = Utils.wrapAngle(A.a);
+		B.a = Utils.wrapAngle(B.a);
+
 		var hDiff = Math.abs(A.height - B.height);
+
 		var aD = Math.abs(A.a - B.a);
 		var aDiff = (A.height + 32*4) * aD;
 
 		var rSum = A.radius + B.radius;
 
 
-		if(hDiff <= rSum || (A.isLaser || B.isLaser))
+		if(hDiff <= rSum || A.laser || B.laser)
 		{
 			return (aDiff <= rSum) ;
 		}

@@ -22,6 +22,17 @@ Utils = {
     cross: function(A, B)
     {
         return A.x * B.y - A.y * B.x;
+    },
+
+    wrapAngle: function(a)
+    {
+        var max = Math.PI * 2;
+        var min = 0;
+
+        if(a < min) return max + (a % max);
+        if(a >= max) return a % max;
+        return a;
+        // console.log(a + " max: "+  max);
     }
 };
 

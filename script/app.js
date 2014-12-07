@@ -1,7 +1,5 @@
 var app = playground({
   smoothing: false,
-  // width: 640,
-  // height: 480,
 
   create: function() {
     this.loadImages("spritesheet");

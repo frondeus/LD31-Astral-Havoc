@@ -6,15 +6,14 @@ app.game = {
 		this.entities = new LD31.Entities();
 		this.collisions = new LD31.Collisions(this.entities);
 
-		this.addEntity({
-			isGround: true
-		});
-
 		this.state = 0;
 		this.msg = "Start";
 		this.introSong = app.playSound("intro",true);
 		this.introSong.volume = 0.25;
 		this.starsPattern = this.createPattern(app.images.spritesheet, [64,0,64,64]);
+
+		this.addEntity(LD31.Ground,{});
+		this.time = 0;
 	},
 
 	startGame: function()
@@ -33,20 +32,16 @@ app.game = {
 
 		this.entities = new LD31.Entities();
 		this.collisions = new LD31.Collisions(this.entities);
-		this.addEntity({
-			isGround: true
-		});
-
-		this.player = this.addEntity({
-			isPlayer: true
-		});
+		this.addEntity(LD31.Ground,{});
+		this.player = this.addEntity(LD31.Player,{});
+		
 
 		this.msg = "It's comming!";
 	},
 	
-	addEntity: function(args)
+	addEntity: function(type, args)
 	{
-		return this.entities.add(LD31.GameObject, args);
+		return this.entities.add(type, args);
 	},
 
 	createPattern: function(source, sprite)
@@ -96,8 +91,33 @@ app.game = {
 
 	onBoost: function()
 	{
-		this.player.weapon_boost = Utils.randomZ(1,2);
-		this.player.boost_cooldown = Utils.randomZ(10,30);
+		var r = Utils.randomZ(1,5);
+		this.player.boost.cooldown = Utils.randomR(10,30);
+		console.log("Boost: " + r);
+		switch(r)
+		{
+			case 1:
+				this.player.boost.invincible = true;
+			break;
+			case 3:
+				this.player.boost.moreFire = 2;
+			break;
+			case 4:
+				this.player.boost.maxCooldown = Utils.randomR(1,3);
+				this.player.boost.projectile = {
+					laser: true,
+					invincible: true,
+					speed: 0,
+					damage: 15,
+					height: 600,
+					cooldown: this.player.boost.maxCooldown /3,
+				};
+			break;
+
+			default:
+				this.player.boost.moreFire = 1;
+			break;
+		}
 	},
 
 	//Creation
@@ -105,13 +125,7 @@ app.game = {
 	createBoost: function()
 	{
 		this.boost_cooldown = Utils.randomR(10,60);
-		this.addEntity({
-			isBoost: true,
-			a: Utils.randomR(0,Math.PI * 2),
-			height: Utils.randomR(190,240),
-			ang_speed: Utils.randomR(-Math.PI / 16, Math.PI/16),
-			cooldown: Utils.randomR(1,10)
-		});
+		this.addEntity(LD31.Boost,{});
 	},
 
 	createBoss: function()
@@ -127,32 +141,24 @@ app.game = {
 
 	createCasualEnemy: function()
 	{
-		this.addEntity({
-			isEnemy: true, team: 1,
-			a: Utils.randomR(0,Math.PI*2),
-			height: Utils.randomR(200,240),
-			ang_speed: Utils.randomR(-Math.PI / 16,Math.PI/16),
-			cooldown: 0,
-			maxCooldown: Utils.randomR(0.4, 2.0)
-		});
+		this.addEntity(LD31.Enemy,{});
 	},
 
 	createLaserEnemy: function()
 	{
 		var ang_speed = Utils.randomR(-Math.PI / 32, Math.PI / 32);
 		var cd = Utils.randomR(3,30);
-		this.addEntity({
-			isEnemy: true, team: 1,
-			a: Utils.randomR(0,Math.PI * 2),
-			height: Utils.randomR(200,240),
+		this.addEntity(LD31.Enemy,{
 			ang_speed: ang_speed,
-			cooldown: 0,
+			cooldown: cd,
 			maxCooldown: cd,
 			hp: 150,
 			projectile: {
-				isLaser: true,
+				laser: true,
+				invincible: true,
 				speed: 0,
 				cooldown: cd /3,
+				damage: 15,
 				ang_speed: ang_speed
 			}
 		});
@@ -181,6 +187,8 @@ app.game = {
 				this.enemyCount++;
 			}
 		}
+		this.time += delta;
+		TWEEN.update(this.time * 1000);
 		this.entities.step(delta);
 		this.collisions.step(delta);
 	},	
@@ -190,6 +198,8 @@ app.game = {
 	{	
 		app.layer.clear(this.starsPattern);
 
+		
+		
 		this.entities.render(delta);
 
 		this.centerText(this.wave || "Click", app.width/2, app.height/2 - 32, "120px");
@@ -223,7 +233,9 @@ app.game = {
 			var dx = app.width/2 - app.mouse.x;
 			var dy = app.height/2 - app.mouse.y;
 			var a = Math.atan2(-dy,-dx);
+			a= Utils.wrapAngle(a);
 			this.player.a = a;	
+
 		}
 	},	
 
