@@ -82,10 +82,7 @@ LD31.Enemy.prototype =
 		this.hp -= damage;
 		if(this.hp <= 0)
 		{
-			if(this.boss)
-				app.game.onBossDestroyed();
-			else
-				app.game.onEnemyDestroyed();
+			app.game.onEnemyDestroyed();
 			app.game.entities.remove(this);
 			this.spawnHp(Utils.randomZ(1,10));
 		}

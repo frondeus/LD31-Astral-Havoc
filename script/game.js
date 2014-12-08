@@ -62,12 +62,6 @@ app.game = {
 
 
 	// Logic
-
-	isBossWave: function()
-	{
-		return ((this.wave % 5 ) === 0);
-	},
-
 	onPlayerDestroyed: function()
 	{
 		this.msg = "Try\nAgain";
@@ -83,28 +77,12 @@ app.game = {
 		this.destroyedEnemy++;
 		if(this.enemyCount <= 0)
 		{
-			if(!this.isBossWave())
-			{
-				this.maxEnemy *= 2;
-				this.player.hp += 10;
-				this.destroyedEnemy = 0;
-				this.enemyCount = 0;
-				this.wave++;
-			}
-			else
-				this.createBoss();
+			this.maxEnemy *= 2;
+			this.player.hp += 10;
+			this.destroyedEnemy = 0;
+			this.enemyCount = 0;
+			this.wave++;
 		}
-	},
-
-	onBossDestroyed: function()
-	{
-		delete this.msg;
-		this.shakeCamera(Utils.randomR(10,20));
-		this.maxEnemy *= 2;
-		this.player.hp += 100;
-		this.destroyedEnemy = 0;
-		this.enemyCount = 0;
-		this.wave++;
 	},
 
 	onBoost: function()
@@ -118,7 +96,7 @@ app.game = {
 				this.player.anim = {
 					frame: 3,
 					to: 0,
-					speed: 0.5,
+					speed: 5,
 				};
 			break;
 			case 3:
@@ -161,19 +139,7 @@ app.game = {
 		this.boost_cooldown = Utils.randomR(10,60);
 		this.addEntity(LD31.Boost,{});
 	},
-
-	createBoss: function()
-	{
-		this.msg = "BOSS";
-		var bossLevel = this.wave % 5;
-		switch(bossLevel)
-		{
-			default:
-				this.addEntity(LD31.Enemy,{boss:true}); // TODO:
-			break;
-		}
-	},
-
+	
 	createCasualEnemy: function()
 	{
 		this.addEntity(LD31.Enemy,{});
