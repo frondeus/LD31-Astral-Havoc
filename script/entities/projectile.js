@@ -18,8 +18,15 @@ LD31.Projectile = function(args)
 		laser: false,
 
 		zIndex: -10,
+		anim: {
+			frame: 3,
+			to: 0,
+			speed: 0,
+		}
 
 	},args);
+
+	this.anim.speed = this.cooldown;
 };
 
 LD31.Projectile.prototype = 
@@ -36,6 +43,7 @@ LD31.Projectile.prototype =
 
 	onCollision: function(other)
 	{
+		if(other._remove) return;
 		if(other.team != this.team)
 		{
 			if(other.onHit && !this.isInvincible(other))
@@ -61,18 +69,36 @@ LD31.Projectile.prototype =
 		if(this.height < 0)
 			app.game.entities.remove(this);
 
+		if(this.parent._remove && this.laser)
+			app.game.entities.remove(this);
+
+
+		if(this.laser)
+		{
+			if(this.parent.class == LD31.Enemy)
+				this.height = this.parent.height;
+			this.a = this.parent.a;
+		}
+
+
 		this.a += this.ang_speed * delta;
 	},
 
 	render: function(delta)
 	{
+	
+		if(this.anim.to > this.anim.frame)
+			this.anim.frame = Math.min(this.anim.to,this.anim.frame + (delta * this.anim.speed));
+		else
+			this.anim.frame = Math.max(this.anim.to,this.anim.frame - (delta * this.anim.speed));
+
 		if(this.laser)
 		{
 			var x = app.width/2 + Math.cos(this.a) * ((32 * 4) + this.height);
 			var y = app.height/2 + Math.sin(this.a) * ((32 * 4) + this.height);
 			var x2 = app.width/2 + Math.cos(this.a) * (32 * 4);
 			var y2 = app.height/2 + Math.sin(this.a) * (32 * 4);
-			app.layer.imageLine(app.images.spritesheet,[(7 + this.team) * 64,0,64,64],x,y,x2,y2,1);
+			app.layer.imageLine(app.images.laser,[(Math.round(this.anim.frame) + (4*this.team)) * 64,0,64,64],x,y,x2,y2,1);
 		}
 		else
 		{
@@ -81,8 +107,12 @@ LD31.Projectile.prototype =
 			app.layer.save()
 				.translate(x, y)
 				.rotate(this.a)
-				.drawRegion(app.images.spritesheet,[(5 + this.team) * 64,0,64,64], -32,-32)
-			.restore();
+				.drawRegion(app.images.static,[(1 + this.team) * 64,0,64,64], -32,-32);
+			
+			if(this.invincible)
+				app.layer.drawRegion(app.images.powerup,[5 * 64,0,64,64],-32,-32);
+			app.layer.restore();
+
 		}
 	}
 };

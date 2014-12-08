@@ -7,7 +7,7 @@ LD31.Player = function(args)
 		team: 0,
 		hp: 100,
 
-		radius: 10,
+		radius: 24,
 
 		input_shoot: false,
 
@@ -16,14 +16,13 @@ LD31.Player = function(args)
 		projectile: {},
 
 		boost: {},
-		// boost:
-		// {
-		//  cooldown: 0,
-		// 	invincible: false,
-		// 	maxCooldown: 0.1,
-		// 	moreFire: 0,
-		//  projectile: {},
-		// }
+
+		randomSprite: Utils.randomZ(0,1),
+		anim:{
+			speed: 1,
+			frame: 0,
+			to: 0,
+		}
 	},args);	
 };
 
@@ -37,12 +36,16 @@ LD31.Player.prototype =
 			team: this.team,
 			height: this.height,
 			a: this.a,
+			parent: this,
 		};
 
 		Utils.extend(args,this.boost.projectile,this.projectile);
 
 		if(args.laser)
+		{
+			app.game.shakeCamera(Utils.randomR(3,5));
 			app.playSound("player_laser");
+		}
 		else
 			app.playSound("player_shoot");
 		 
@@ -62,6 +65,7 @@ LD31.Player.prototype =
 
 	onHit: function(damage)
 	{
+		app.game.shakeCamera(Utils.randomR(0.5,2));
 		this.hp -= damage;
 		if(this.hp <= 0)
 		{
@@ -93,17 +97,24 @@ LD31.Player.prototype =
 
 	render: function(delta)
 	{
-		// console.log("Player: "+ this.a );
+		if(this.anim.to > this.anim.frame)
+			this.anim.frame = Math.min(this.anim.to,this.anim.frame + (delta * this.anim.speed));
+		else
+			this.anim.frame = Math.max(this.anim.to,this.anim.frame - (delta * this.anim.speed));
+
+		
 
 		var x = app.width/2 + Math.cos(this.a) * ((32 * 4));
 		var y = app.height/2 +  Math.sin(this.a) * ((32 * 4));
 		app.layer.save()
 			.translate(x, y)
-			.rotate(this.a);
+			.rotate(this.a + Math.PI/2)
+			.drawRegion(app.images.player,[this.randomSprite * 64,0,64,64], -32,-32);
 
-		app.layer.drawRegion(app.images.spritesheet,[2 * 64,0,64,64], -32,-32);
-		if(this.invincible)
-			app.layer.drawRegion(app.images.spritesheet,[640, 0, 64,64],-32,-32);
+
+
+		if(this.boost.invincible || this.invincible)
+			app.layer.drawRegion(app.images.powerup,[Math.round(this.anim.frame) * 64, 0, 64,64],-32,-32);
 		
 		app.layer.restore();
 	}

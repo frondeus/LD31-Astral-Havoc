@@ -4,7 +4,7 @@ LD31.Boost = function(args)
 	{
 		a: Utils.randomR(0,Math.PI * 2),
 		height: Utils.randomR(190,240),
-		radius: 10,
+		radius: 32,
 		cooldown: Utils.randomR(1,10),
 		ang_speed: Utils.randomR(-Math.PI / 16, Math.PI/16),
 		speed: 0,
@@ -31,7 +31,7 @@ LD31.Boost.prototype =
 		app.layer.save()
 			.translate(x, y)
 			.rotate(this.a)
-			.drawRegion(app.images.spritesheet,[9 * 64,0,64,64], -32,-32)
+			.drawRegion(app.images.static,[3 * 64,0,64,64], -32,-32)
 		.restore();
 	}
 };

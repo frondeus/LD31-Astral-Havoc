@@ -32,7 +32,7 @@ LD31.Hp.prototype =
 		app.layer.save()
 			.translate(x, y)
 			.rotate(this.a)
-			.drawRegion(app.images.spritesheet,[4 * 64,0,64,64], -32,-32)
+			.drawRegion(app.images.static,[4 * 64,0,64,64], -32,-32)
 		.restore();
 	}
 };

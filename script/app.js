@@ -2,7 +2,7 @@ var app = playground({
   smoothing: false,
 
   create: function() {
-    this.loadImages("spritesheet");
+    this.loadImages("static", "player","enemy", "powerup", "laser", "sky");
     this.loadSounds("intro","casual",
         "boost", "enemy_laser", "enemy_shoot" ,"hp_taken","player_laser", "player_shoot");
   },
